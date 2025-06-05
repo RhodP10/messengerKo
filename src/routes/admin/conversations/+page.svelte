@@ -32,7 +32,7 @@
 	let selectedConversation = $state<any>(null);
 	let showDeleteModal = $state(false);
 	let showBulkDeleteModal = $state(false);
-	let bulkDeleteType = $state<'all' | 'direct' | 'group' | ''>(''); // 'all', 'direct', 'group'
+	let bulkDeleteType = $state<'all' | 'direct' | 'group' | 'nuclear' | ''>(''); // 'all', 'direct', 'group', 'nuclear'
 	let confirmText = $state('');
 
 	onMount(() => {
@@ -130,6 +130,8 @@
 		try {
 			if (bulkDeleteType === 'all') {
 				await adminConversationsApi.deleteAllConversations();
+			} else if (bulkDeleteType === 'nuclear') {
+				await adminConversationsApi.nuclearDeleteAllConversations();
 			} else if (bulkDeleteType === 'direct' || bulkDeleteType === 'group') {
 				await adminConversationsApi.deleteConversationsByType(bulkDeleteType);
 			}
@@ -200,7 +202,13 @@
 							onclick={() => openBulkDeleteModal('all')}
 							class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
 						>
-							Delete ALL Conversations
+							Clear All Conversations
+						</button>
+						<button
+							onclick={() => openBulkDeleteModal('nuclear')}
+							class="bg-red-800 hover:bg-red-900 text-white px-4 py-2 rounded-md text-sm font-medium border-2 border-red-900"
+						>
+							🚨 NUCLEAR DELETE
 						</button>
 					</div>
 				</div>
@@ -546,7 +554,9 @@
 				<div class="mt-3">
 					<h3 class="text-lg font-medium text-gray-900 mb-4">
 						{#if bulkDeleteType === 'all'}
-							Delete ALL Conversations
+							Clear All Conversations
+						{:else if bulkDeleteType === 'nuclear'}
+							🚨 NUCLEAR DELETE - Destroy Everything
 						{:else if bulkDeleteType === 'direct'}
 							Delete All Direct Chats
 						{:else if bulkDeleteType === 'group'}
@@ -567,8 +577,11 @@
 								<div class="mt-2 text-sm text-red-700">
 									<p>
 										{#if bulkDeleteType === 'all'}
-											This will permanently delete ALL conversations and messages in the entire system.
-											This includes both direct chats and group chats.
+											This will delete ALL direct conversations completely and clear ALL messages from group chats.
+											<strong>Group chat structures will be preserved</strong> but their message history will be cleared.
+										{:else if bulkDeleteType === 'nuclear'}
+											⚠️ NUCLEAR OPTION: This will completely destroy EVERYTHING - all conversations, group chats, and messages.
+											No chat structures will be preserved. This is the ultimate reset.
 										{:else if bulkDeleteType === 'direct'}
 											This will permanently delete ALL direct conversations and their messages.
 										{:else if bulkDeleteType === 'group'}
@@ -599,10 +612,12 @@
 						<button
 							onclick={handleBulkDelete}
 							disabled={confirmText !== 'DELETE'}
-							class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+							class="px-4 py-2 text-sm font-medium text-white {bulkDeleteType === 'nuclear' ? 'bg-red-800 hover:bg-red-900' : 'bg-red-600 hover:bg-red-700'} rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{#if bulkDeleteType === 'all'}
-								Delete ALL Conversations
+								Clear All Conversations
+							{:else if bulkDeleteType === 'nuclear'}
+								🚨 NUCLEAR DELETE
 							{:else if bulkDeleteType === 'direct'}
 								Delete All Direct Chats
 							{:else if bulkDeleteType === 'group'}

@@ -440,9 +440,19 @@ export const adminConversationsApi = {
 
   async deleteAllConversations() {
     return await apiRequest<{
-      deletedConversations: number;
+      deletedDirectConversations: number;
+      clearedGroupChats: number;
       deletedMessages: number;
     }>('/admin/conversations/bulk/all', {
+      method: 'DELETE',
+    });
+  },
+
+  async nuclearDeleteAllConversations() {
+    return await apiRequest<{
+      deletedConversations: number;
+      deletedMessages: number;
+    }>('/admin/conversations/bulk/nuclear', {
       method: 'DELETE',
     });
   },

@@ -217,9 +217,54 @@ router.delete('/:id', authenticateAdmin, async (req, res) => {
 });
 
 // @route   DELETE /api/admin/conversations/bulk/all
-// @desc    Delete ALL conversations and messages (nuclear option)
+// @desc    Delete all direct conversations completely, but only messages from group chats
 // @access  Admin only
 router.delete('/bulk/all', authenticateAdmin, async (req, res) => {
+  try {
+    // Count before deletion for reporting
+    const totalMessageCount = await Message.countDocuments();
+    const directConversations = await Conversation.find({ type: 'direct' });
+    const groupConversations = await Conversation.find({ type: 'group' });
+
+    const directConversationIds = directConversations.map(c => c._id);
+
+    // Delete all messages (both direct and group)
+    await Message.deleteMany({});
+
+    // Delete only direct conversations (keep group structures)
+    await Conversation.deleteMany({ type: 'direct' });
+
+    // Reset group conversations (clear lastMessage and update timestamp)
+    await Conversation.updateMany(
+      { type: 'group' },
+      {
+        $unset: { lastMessage: 1 },
+        $set: { updatedAt: new Date() }
+      }
+    );
+
+    res.json({
+      success: true,
+      message: 'All direct conversations deleted, group chat messages cleared (group structures preserved)',
+      data: {
+        deletedDirectConversations: directConversations.length,
+        clearedGroupChats: groupConversations.length,
+        deletedMessages: totalMessageCount
+      }
+    });
+  } catch (error) {
+    console.error('Bulk delete all error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during bulk deletion'
+    });
+  }
+});
+
+// @route   DELETE /api/admin/conversations/bulk/nuclear
+// @desc    Nuclear option: Delete EVERYTHING including group chat structures
+// @access  Admin only
+router.delete('/bulk/nuclear', authenticateAdmin, async (req, res) => {
   try {
     // Count before deletion for reporting
     const conversationCount = await Conversation.countDocuments();
@@ -228,22 +273,22 @@ router.delete('/bulk/all', authenticateAdmin, async (req, res) => {
     // Delete all messages first
     await Message.deleteMany({});
 
-    // Delete all conversations
+    // Delete all conversations (including groups)
     await Conversation.deleteMany({});
 
     res.json({
       success: true,
-      message: 'All conversations and messages deleted successfully',
+      message: 'NUCLEAR DELETION: All conversations and messages completely destroyed',
       data: {
         deletedConversations: conversationCount,
         deletedMessages: messageCount
       }
     });
   } catch (error) {
-    console.error('Bulk delete all error:', error);
+    console.error('Nuclear delete error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error during bulk deletion'
+      message: 'Server error during nuclear deletion'
     });
   }
 });
