@@ -326,6 +326,20 @@ export const adminUsersApi = {
     return await apiRequest<{ user: any }>(`/admin/users/${userId}`);
   },
 
+  async createUser(userData: {
+    username: string;
+    email: string;
+    password: string;
+    firstName?: string;
+    lastName?: string;
+    isActive?: boolean;
+  }) {
+    return await apiRequest<{ user: any }>('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  },
+
   async updateUser(userId: string, userData: {
     username?: string;
     email?: string;

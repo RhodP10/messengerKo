@@ -108,6 +108,63 @@ router.get('/stats/overview', authenticateAdmin, async (req, res) => {
   }
 });
 
+// @route   POST /api/admin/users
+// @desc    Create new user account
+// @access  Admin only
+router.post('/', authenticateAdmin, async (req, res) => {
+  try {
+    const { username, email, password, firstName, lastName, isActive = true } = req.body;
+
+    // Validation
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username, email, and password are required'
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: existingUser.email === email
+          ? 'Email already exists'
+          : 'Username already exists'
+      });
+    }
+
+    // Create new user
+    const newUser = new User({
+      username,
+      email,
+      password,
+      firstName: firstName || '',
+      lastName: lastName || '',
+      isActive
+    });
+
+    await newUser.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      data: {
+        user: newUser.toJSON()
+      }
+    });
+  } catch (error) {
+    console.error('Create user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error creating user'
+    });
+  }
+});
+
 // @route   GET /api/admin/users/:id
 // @desc    Get single user by ID
 // @access  Admin only

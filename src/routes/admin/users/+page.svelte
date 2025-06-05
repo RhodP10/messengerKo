@@ -6,7 +6,7 @@
 
 	const authState = $derived(authStore);
 
-	let users = $state([]);
+	let users = $state<any[]>([]);
 	let pagination = $state({
 		currentPage: 1,
 		totalPages: 1,
@@ -26,10 +26,19 @@
 	let isLoading = $state(false);
 	let searchQuery = $state('');
 	let sortBy = $state('createdAt');
-	let sortOrder = $state('desc');
-	let selectedUser = $state(null);
+	let sortOrder = $state<'asc' | 'desc'>('desc');
+	let selectedUser = $state<any>(null);
 	let showEditModal = $state(false);
 	let showDeleteModal = $state(false);
+	let showCreateModal = $state(false);
+	let newUser = $state({
+		username: '',
+		email: '',
+		password: '',
+		firstName: '',
+		lastName: '',
+		isActive: true
+	});
 
 	onMount(() => {
 		// Check authentication
@@ -99,6 +108,45 @@
 	function openDeleteModal(user: any) {
 		selectedUser = user;
 		showDeleteModal = true;
+	}
+
+	function openCreateModal() {
+		newUser = {
+			username: '',
+			email: '',
+			password: '',
+			firstName: '',
+			lastName: '',
+			isActive: true
+		};
+		showCreateModal = true;
+	}
+
+	async function handleCreateUser() {
+		try {
+			await adminUsersApi.createUser({
+				username: newUser.username,
+				email: newUser.email,
+				password: newUser.password,
+				firstName: newUser.firstName,
+				lastName: newUser.lastName,
+				isActive: newUser.isActive
+			});
+
+			showCreateModal = false;
+			newUser = {
+				username: '',
+				email: '',
+				password: '',
+				firstName: '',
+				lastName: '',
+				isActive: true
+			};
+			loadUsers();
+			loadUserStats();
+		} catch (error) {
+			console.error('Error creating user:', error);
+		}
 	}
 
 	async function handleUpdateUser() {
@@ -177,6 +225,14 @@
 							</svg>
 						</button>
 						<h1 class="text-2xl font-bold text-gray-900">User Management</h1>
+					</div>
+					<div>
+						<button
+							onclick={openCreateModal}
+							class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+						>
+							Create New User
+						</button>
 					</div>
 				</div>
 			</div>
@@ -547,6 +603,90 @@
 							class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md"
 						>
 							Delete User
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	{/if}
+
+	<!-- Create User Modal -->
+	{#if showCreateModal}
+		<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+			<div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+				<div class="mt-3">
+					<h3 class="text-lg font-medium text-gray-900 mb-4">Create New User</h3>
+					<div class="space-y-4">
+						<div>
+							<label class="block text-sm font-medium text-gray-700">Username *</label>
+							<input
+								type="text"
+								bind:value={newUser.username}
+								placeholder="Enter username"
+								class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+								required
+							/>
+						</div>
+						<div>
+							<label class="block text-sm font-medium text-gray-700">Email *</label>
+							<input
+								type="email"
+								bind:value={newUser.email}
+								placeholder="Enter email address"
+								class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+								required
+							/>
+						</div>
+						<div>
+							<label class="block text-sm font-medium text-gray-700">Password *</label>
+							<input
+								type="password"
+								bind:value={newUser.password}
+								placeholder="Enter password"
+								class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+								required
+							/>
+						</div>
+						<div>
+							<label class="block text-sm font-medium text-gray-700">First Name</label>
+							<input
+								type="text"
+								bind:value={newUser.firstName}
+								placeholder="Enter first name (optional)"
+								class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+							/>
+						</div>
+						<div>
+							<label class="block text-sm font-medium text-gray-700">Last Name</label>
+							<input
+								type="text"
+								bind:value={newUser.lastName}
+								placeholder="Enter last name (optional)"
+								class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+							/>
+						</div>
+						<div class="flex items-center">
+							<input
+								type="checkbox"
+								bind:checked={newUser.isActive}
+								class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+							/>
+							<label class="ml-2 block text-sm text-gray-900">Active Account</label>
+						</div>
+					</div>
+					<div class="flex justify-end space-x-3 mt-6">
+						<button
+							onclick={() => { showCreateModal = false; }}
+							class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+						>
+							Cancel
+						</button>
+						<button
+							onclick={handleCreateUser}
+							disabled={!newUser.username || !newUser.email || !newUser.password}
+							class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							Create User
 						</button>
 					</div>
 				</div>
