@@ -5,6 +5,10 @@ export interface User {
 	avatar?: string;
 	isOnline: boolean;
 	lastSeen?: Date;
+	userType?: 'user' | 'admin';
+	role?: string;
+	permissions?: string[];
+	fullName?: string;
 }
 
 export interface Message {

@@ -5,6 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import path from 'path';
 
 // Import configurations and middleware
 import connectDB from './config/database.js';
@@ -17,6 +18,7 @@ import userRoutes from './routes/users.js';
 import conversationRoutes from './routes/conversations.js';
 import messageRoutes from './routes/messages.js';
 import adminRoutes from './routes/admin.js';
+import adminAuthRoutes from './routes/adminAuth.js';
 
 // Load environment variables
 dotenv.config();
@@ -44,7 +46,7 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "https:"],
     },
   },
@@ -86,11 +88,16 @@ app.get('/health', (req, res) => {
   });
 });
 
+
+
+
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin', adminRoutes);
 
 // 404 handler for API routes

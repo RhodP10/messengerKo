@@ -111,17 +111,23 @@ export const authApi = {
     const response = await apiRequest<{
       user: any;
       token: string;
+      userType?: string;
     }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
 
-    // Store token (only in browser)
+    // Store token and user data (only in browser)
     if (browser) {
       localStorage.setItem('auth_token', response.token);
-      localStorage.setItem('auth_user', JSON.stringify(response.user));
+      // Store user data with userType for proper handling
+      const userDataToStore = {
+        ...response.user,
+        userType: response.userType || 'user'
+      };
+      localStorage.setItem('auth_user', JSON.stringify(userDataToStore));
     }
-    
+
     return response;
   },
 

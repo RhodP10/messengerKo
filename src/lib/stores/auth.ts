@@ -23,13 +23,20 @@ function createAuthStore() {
 					password
 				});
 
+				// Handle both user and admin responses
+				const userData = response.user;
+				const userType = response.userType || 'user';
+
 				const user: User = {
-					id: response.user._id,
-					email: response.user.email,
-					username: response.user.username,
-					isOnline: response.user.isOnline,
-					avatar: response.user.avatar,
-					role: response.user.role || 'user'
+					id: userData._id,
+					email: userData.email,
+					username: userData.username,
+					isOnline: userData.isOnline || false,
+					avatar: userData.avatar,
+					userType: userType,
+					role: userData.role || (userType === 'admin' ? 'admin' : 'user'),
+					permissions: userData.permissions || [],
+					fullName: userData.fullName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
 				};
 
 				set({
@@ -38,8 +45,8 @@ function createAuthStore() {
 					isLoading: false
 				});
 
-				// Connect to Socket.io
-				if (browser) {
+				// Connect to Socket.io (only for regular users, not admins)
+				if (browser && userType !== 'admin') {
 					const token = localStorage.getItem('auth_token');
 					if (token) {
 						socketService.connect(token);
@@ -64,13 +71,20 @@ function createAuthStore() {
 					password
 				});
 
+				// Handle user registration response
+				const userData = response.user;
+				const userType = response.userType || 'user';
+
 				const user: User = {
-					id: response.user._id,
-					email: response.user.email,
-					username: response.user.username,
-					isOnline: response.user.isOnline,
-					avatar: response.user.avatar,
-					role: response.user.role || 'user'
+					id: userData._id,
+					email: userData.email,
+					username: userData.username,
+					isOnline: userData.isOnline || false,
+					avatar: userData.avatar,
+					userType: userType,
+					role: userData.role || 'user',
+					permissions: userData.permissions || [],
+					fullName: userData.fullName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
 				};
 
 				set({
@@ -122,13 +136,20 @@ function createAuthStore() {
 				try {
 					// Verify token with backend
 					const response = await authApi.getCurrentUser();
+					const userData = response.user;
+					const storedUserData = JSON.parse(storedUser);
+					const userType = storedUserData.userType || 'user';
+
 					const user: User = {
-						id: response.user._id,
-						email: response.user.email,
-						username: response.user.username,
-						isOnline: response.user.isOnline,
-						avatar: response.user.avatar,
-						role: response.user.role || 'user'
+						id: userData._id,
+						email: userData.email,
+						username: userData.username,
+						isOnline: userData.isOnline || false,
+						avatar: userData.avatar,
+						userType: userType,
+						role: userData.role || (userType === 'admin' ? 'admin' : 'user'),
+						permissions: userData.permissions || [],
+						fullName: userData.fullName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
 					};
 
 					set({

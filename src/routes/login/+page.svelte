@@ -9,7 +9,12 @@
 	onMount(() => {
 		// Redirect if already authenticated
 		if ($authState.isAuthenticated) {
-			goto('/chat');
+			// Redirect based on user type
+			if ($authState.user?.userType === 'admin') {
+				goto('/admin');
+			} else {
+				goto('/chat');
+			}
 		}
 	});
 </script>

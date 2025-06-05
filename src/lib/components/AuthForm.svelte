@@ -49,7 +49,14 @@
 			}
 
 			if (result.success) {
-				goto('/chat');
+				// Redirect based on user type
+				const currentUser = $authState.user;
+
+				if (currentUser?.userType === 'admin') {
+					goto('/admin');
+				} else {
+					goto('/chat');
+				}
 			} else {
 				error = result.error || 'Authentication failed';
 			}
