@@ -35,7 +35,11 @@ class SocketService {
     }
 
     console.log('🔌 Attempting to connect to Socket.io server...');
-    this.socket = io('http://localhost:3002', {
+    const socketUrl = import.meta.env.PROD
+      ? 'https://messengerko-backend-abc123.onrender.com'  // Replace 'abc123' with your actual URL
+      : 'http://localhost:3002';
+
+    this.socket = io(socketUrl, {
       auth: {
         token
       },

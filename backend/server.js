@@ -134,7 +134,7 @@ io.on('connection', (socket) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 10000;  // Render.com uses port 10000
 
 server.listen(PORT, () => {
   console.log(`

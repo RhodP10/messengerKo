@@ -11,7 +11,14 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check ."
+		"lint": "prettier --check .",
+		"mobile:install": "npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/splash-screen @capacitor/status-bar @capacitor/keyboard",
+		"mobile:init": "npx cap init MessengerKo com.messengerko.app",
+		"mobile:add": "npx cap add android",
+		"mobile:build": "npm run build && npx cap copy android && npx cap sync android",
+		"mobile:open": "npx cap open android",
+		"mobile:setup": "npm run mobile:install && npm run mobile:init && npm run mobile:add",
+		"mobile:dev": "npm run mobile:build && npm run mobile:open"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^6.0.0",

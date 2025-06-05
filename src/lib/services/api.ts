@@ -1,7 +1,9 @@
 import { browser } from '$app/environment';
 
 // API Configuration
-const API_BASE_URL = 'http://localhost:3002/api';
+const API_BASE_URL = import.meta.env.PROD
+  ? 'https://messengerko-backend-abc123.onrender.com/api'  // Replace 'abc123' with your actual URL
+  : 'http://localhost:3002/api';
 
 // API Response Types
 interface ApiResponse<T = any> {
