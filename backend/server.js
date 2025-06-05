@@ -17,6 +17,7 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import conversationRoutes from './routes/conversations.js';
 import messageRoutes from './routes/messages.js';
+import groupMembersRoutes from './routes/groupMembers.js';
 import adminRoutes from './routes/admin.js';
 import adminAuthRoutes from './routes/adminAuth.js';
 import adminUsersRoutes from './routes/adminUsers.js';
@@ -98,6 +99,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/conversations', conversationRoutes);
+app.use('/api/conversations', groupMembersRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin/users', adminUsersRoutes);

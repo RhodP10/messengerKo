@@ -225,6 +225,40 @@ export const conversationsApi = {
       method: 'POST',
       body: JSON.stringify({ userId }),
     });
+  },
+
+  // Group member management
+  async getGroupMembers(conversationId: string) {
+    return await apiRequest<{
+      conversation: any;
+      members: any[];
+    }>(`/conversations/${conversationId}/members`);
+  },
+
+  async addGroupMembers(conversationId: string, userIds: string[]) {
+    return await apiRequest<{
+      addedUsers: any[];
+      alreadyMembers: any[];
+      totalMembers: number;
+    }>(`/conversations/${conversationId}/members`, {
+      method: 'POST',
+      body: JSON.stringify({ userIds }),
+    });
+  },
+
+  async removeGroupMember(conversationId: string, userId: string) {
+    return await apiRequest<{
+      removedUser: any;
+      remainingMembers: number;
+    }>(`/conversations/${conversationId}/members/${userId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async getAvailableUsers(conversationId: string) {
+    return await apiRequest<{
+      availableUsers: any[];
+    }>(`/conversations/${conversationId}/available-users`);
   }
 };
 

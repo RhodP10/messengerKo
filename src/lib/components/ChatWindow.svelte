@@ -2,6 +2,7 @@
 	import { chatStore } from '../stores/chat.js';
 	import Message from './Message.svelte';
 	import MessageInput from './MessageInput.svelte';
+	import GroupMemberModal from './GroupMemberModal.svelte';
 	import type { User, Conversation } from '../types.js';
 
 	interface Props {
@@ -14,6 +15,7 @@
 
 	const chatState = $derived(chatStore);
 	let messagesContainer = $state<HTMLDivElement>();
+	let showGroupMemberModal = $state(false);
 
 	// Scroll to bottom when messages change
 	$effect(() => {
@@ -25,15 +27,27 @@
 	function formatLastSeen(date: Date): string {
 		const now = new Date();
 		const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-		
+
 		if (diffInMinutes < 1) return 'Active now';
 		if (diffInMinutes < 60) return `Active ${diffInMinutes}m ago`;
-		
+
 		const diffInHours = Math.floor(diffInMinutes / 60);
 		if (diffInHours < 24) return `Active ${diffInHours}h ago`;
-		
+
 		const diffInDays = Math.floor(diffInHours / 24);
 		return `Active ${diffInDays}d ago`;
+	}
+
+	function handleChatInfo() {
+		if (activeConversation?.type === 'group') {
+			showGroupMemberModal = true;
+		}
+	}
+
+	function handleMembersUpdated() {
+		// Refresh the conversation data if needed
+		// This could trigger a refresh of the conversation list
+		showGroupMemberModal = false;
 	}
 </script>
 
@@ -126,11 +140,23 @@
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
 					</svg>
 				</button>
-				<button aria-label="Chat info" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-					</svg>
-				</button>
+				{#if activeConversation?.type === 'group'}
+					<button
+						aria-label="Manage Group Members"
+						onclick={handleChatInfo}
+						class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+						</svg>
+					</button>
+				{:else}
+					<button aria-label="Chat info" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+						</svg>
+					</button>
+				{/if}
 			</div>
 		</div>
 
@@ -179,4 +205,15 @@
 			Select a conversation from the sidebar to start chatting with your friends.
 		</p>
 	</div>
+{/if}
+
+<!-- Group Member Modal -->
+{#if activeConversation && currentUser}
+	<GroupMemberModal
+		conversation={activeConversation}
+		currentUser={currentUser}
+		isOpen={showGroupMemberModal}
+		onClose={() => showGroupMemberModal = false}
+		onMembersUpdated={handleMembersUpdated}
+	/>
 {/if}
