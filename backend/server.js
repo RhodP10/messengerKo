@@ -19,6 +19,8 @@ import conversationRoutes from './routes/conversations.js';
 import messageRoutes from './routes/messages.js';
 import adminRoutes from './routes/admin.js';
 import adminAuthRoutes from './routes/adminAuth.js';
+import adminUsersRoutes from './routes/adminUsers.js';
+import adminConversationsRoutes from './routes/adminConversations.js';
 
 // Load environment variables
 dotenv.config();
@@ -98,6 +100,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/admin/users', adminUsersRoutes);
+app.use('/api/admin/conversations', adminConversationsRoutes);
 app.use('/api/admin', adminRoutes);
 
 // 404 handler for API routes

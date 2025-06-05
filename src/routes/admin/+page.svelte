@@ -143,7 +143,10 @@
 							Quick Actions
 						</h3>
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-							<button class="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 rounded-lg border border-gray-300 hover:border-gray-400">
+							<button
+								onclick={() => goto('/admin/users')}
+								class="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 rounded-lg border border-gray-300 hover:border-gray-400"
+							>
 								<div>
 									<span class="rounded-lg inline-flex p-3 bg-blue-50 text-blue-700 ring-4 ring-white">
 										<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,7 +165,10 @@
 								</div>
 							</button>
 
-							<button class="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 rounded-lg border border-gray-300 hover:border-gray-400">
+							<button
+								onclick={() => goto('/admin/conversations')}
+								class="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 rounded-lg border border-gray-300 hover:border-gray-400"
+							>
 								<div>
 									<span class="rounded-lg inline-flex p-3 bg-green-50 text-green-700 ring-4 ring-white">
 										<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

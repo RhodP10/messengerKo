@@ -293,6 +293,163 @@ export const messagesApi = {
   }
 };
 
+// Admin Users API
+export const adminUsersApi = {
+  async getAllUsers(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}) {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page.toString());
+    if (params.limit) queryParams.append('limit', params.limit.toString());
+    if (params.search) queryParams.append('search', params.search);
+    if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+
+    return await apiRequest<{
+      users: any[];
+      pagination: {
+        currentPage: number;
+        totalPages: number;
+        totalUsers: number;
+        hasNextPage: boolean;
+        hasPrevPage: boolean;
+        limit: number;
+      };
+    }>(`/admin/users?${queryParams.toString()}`);
+  },
+
+  async getUser(userId: string) {
+    return await apiRequest<{ user: any }>(`/admin/users/${userId}`);
+  },
+
+  async updateUser(userId: string, userData: {
+    username?: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    isActive?: boolean;
+  }) {
+    return await apiRequest<{ user: any }>(`/admin/users/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+  },
+
+  async deleteUser(userId: string) {
+    return await apiRequest(`/admin/users/${userId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async toggleUserStatus(userId: string) {
+    return await apiRequest<{ user: any }>(`/admin/users/${userId}/toggle-status`, {
+      method: 'POST',
+    });
+  },
+
+  async getUserStats() {
+    return await apiRequest<{
+      stats: {
+        totalUsers: number;
+        activeUsers: number;
+        inactiveUsers: number;
+        onlineUsers: number;
+        newUsers: number;
+      };
+    }>('/admin/users/stats/overview');
+  }
+};
+
+// Admin Conversations API
+export const adminConversationsApi = {
+  async getAllConversations(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    type?: 'direct' | 'group' | '';
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}) {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page.toString());
+    if (params.limit) queryParams.append('limit', params.limit.toString());
+    if (params.search) queryParams.append('search', params.search);
+    if (params.type) queryParams.append('type', params.type);
+    if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+
+    return await apiRequest<{
+      conversations: any[];
+      pagination: {
+        currentPage: number;
+        totalPages: number;
+        totalConversations: number;
+        hasNextPage: boolean;
+        hasPrevPage: boolean;
+        limit: number;
+      };
+    }>(`/admin/conversations?${queryParams.toString()}`);
+  },
+
+  async getConversation(conversationId: string) {
+    return await apiRequest<{
+      conversation: any;
+      messages: any[];
+    }>(`/admin/conversations/${conversationId}`);
+  },
+
+  async deleteConversation(conversationId: string) {
+    return await apiRequest<{
+      deletedMessages: number;
+    }>(`/admin/conversations/${conversationId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async deleteAllConversations() {
+    return await apiRequest<{
+      deletedConversations: number;
+      deletedMessages: number;
+    }>('/admin/conversations/bulk/all', {
+      method: 'DELETE',
+    });
+  },
+
+  async deleteConversationsByType(type: 'direct' | 'group') {
+    return await apiRequest<{
+      deletedConversations: number;
+      deletedMessages: number;
+    }>(`/admin/conversations/bulk/type/${type}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async deleteConversationMessages(conversationId: string) {
+    return await apiRequest<{
+      deletedMessages: number;
+    }>(`/admin/conversations/${conversationId}/messages`, {
+      method: 'DELETE',
+    });
+  },
+
+  async getConversationStats() {
+    return await apiRequest<{
+      stats: {
+        totalConversations: number;
+        directChats: number;
+        groupChats: number;
+        totalMessages: number;
+        recentMessages: number;
+        activeConversations: number;
+      };
+    }>('/admin/conversations/stats/overview');
+  }
+};
+
 // Health Check
 export const healthApi = {
   async checkHealth() {
