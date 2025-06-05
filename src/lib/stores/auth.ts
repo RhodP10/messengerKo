@@ -45,10 +45,11 @@ function createAuthStore() {
 					isLoading: false
 				});
 
-				// Connect to Socket.io (only for regular users, not admins)
-				if (browser && userType !== 'admin') {
+				// Connect to Socket.io for all authenticated users
+				if (browser) {
 					const token = localStorage.getItem('auth_token');
 					if (token) {
+						console.log('🔌 Connecting to Socket.io for user:', user.username);
 						socketService.connect(token);
 					}
 				}

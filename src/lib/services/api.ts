@@ -47,7 +47,9 @@ async function apiRequest<T = any>(
   };
 
   try {
+    console.log('🔍 API Request:', { url, method: config.method || 'GET', body: config.body });
     const response = await fetch(url, config);
+    console.log('📡 API Response:', { status: response.status, statusText: response.statusText });
     const data: ApiResponse<T> = await response.json();
 
     if (!response.ok) {

@@ -54,10 +54,12 @@
 
 	async function loadAvailableUsers() {
 		try {
+			console.log('🔍 Loading available users for conversation:', conversation.id);
 			const response = await conversationsApi.getAvailableUsers(conversation.id);
+			console.log('✅ Available users loaded:', response.availableUsers.length);
 			availableUsers = response.availableUsers;
 		} catch (err) {
-			console.error('Error loading available users:', err);
+			console.error('❌ Error loading available users:', err);
 		}
 	}
 
@@ -67,7 +69,12 @@
 		isLoading = true;
 		error = '';
 		try {
-			console.log('Adding users to group:', { conversationId: conversation.id, userIds: selectedUsers });
+			console.log('🔍 Adding users to group:', {
+				conversationId: conversation.id,
+				conversationType: conversation.type,
+				userIds: selectedUsers,
+				selectedCount: selectedUsers.length
+			});
 			const response = await conversationsApi.addGroupMembers(conversation.id, selectedUsers);
 			console.log('Add members response:', response);
 			selectedUsers = [];

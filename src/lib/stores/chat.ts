@@ -59,6 +59,12 @@ function createChatStore() {
 	// Set up Socket.io event listeners
 	socketService.on('new_message', (message: any) => {
 		console.log('📨 Received new message via Socket.io:', message);
+		console.log('📨 Message details:', {
+			id: message._id,
+			content: message.content,
+			senderId: message.sender?._id || message.senderId,
+			conversationId: message.conversationId || message.conversation
+		});
 
 		// COMPLETELY SKIP our own messages - we handle them through optimistic updates
 		if (currentUserId && message.senderId === currentUserId) {

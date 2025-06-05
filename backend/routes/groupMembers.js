@@ -66,9 +66,16 @@ router.get('/:id/members', authenticateToken, async (req, res) => {
 // @access  Private (creator or existing members)
 router.post('/:id/members', authenticateToken, async (req, res) => {
   try {
+    console.log('🔍 Add group members request:', {
+      conversationId: req.params.id,
+      userId: req.user._id,
+      body: req.body
+    });
+
     const { userIds } = req.body;
 
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+      console.log('❌ Invalid userIds:', userIds);
       return res.status(400).json({
         success: false,
         message: 'User IDs array is required'
@@ -79,7 +86,18 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
       .populate('participants', 'username email')
       .populate('createdBy', 'username email');
 
+    console.log('🔍 Found conversation:', conversation ? 'Yes' : 'No');
+    if (conversation) {
+      console.log('📝 Conversation details:', {
+        id: conversation._id,
+        type: conversation.type,
+        participantCount: conversation.participants.length,
+        createdBy: conversation.createdBy
+      });
+    }
+
     if (!conversation) {
+      console.log('❌ Conversation not found for ID:', req.params.id);
       return res.status(404).json({
         success: false,
         message: 'Conversation not found'
@@ -90,7 +108,15 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
     const isParticipant = conversation.participants.some(p => p._id.equals(req.user._id));
     const isCreator = conversation.createdBy._id.equals(req.user._id);
 
+    console.log('🔍 Permission check:', {
+      isParticipant,
+      isCreator,
+      userId: req.user._id,
+      createdBy: conversation.createdBy._id
+    });
+
     if (!isParticipant && !isCreator) {
+      console.log('❌ User not authorized');
       return res.status(403).json({
         success: false,
         message: 'You are not authorized to add members to this conversation'
@@ -106,12 +132,16 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
     }
 
     // Validate that all user IDs exist
-    const usersToAdd = await User.find({ 
+    console.log('🔍 Looking for users:', userIds);
+    const usersToAdd = await User.find({
       _id: { $in: userIds },
-      isActive: true 
+      isActive: true
     });
 
+    console.log('🔍 Found users:', usersToAdd.map(u => ({ id: u._id, username: u.username })));
+
     if (usersToAdd.length !== userIds.length) {
+      console.log('❌ Some users not found or inactive');
       return res.status(400).json({
         success: false,
         message: 'One or more users not found or inactive'
@@ -132,9 +162,11 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
     }
 
     if (addedUsers.length > 0) {
+      console.log('✅ Saving conversation with new members');
       await conversation.save();
 
       // Create system message about new members
+      console.log('✅ Creating system message');
       const systemMessage = new Message({
         conversation: conversation._id,
         sender: req.user._id,
@@ -144,9 +176,11 @@ router.post('/:id/members', authenticateToken, async (req, res) => {
       await systemMessage.save();
 
       // Update last activity
+      console.log('✅ Updating last activity');
       await conversation.updateLastActivity(systemMessage._id);
     }
 
+    console.log('✅ Sending success response');
     res.json({
       success: true,
       message: `${addedUsers.length} member(s) added successfully`,

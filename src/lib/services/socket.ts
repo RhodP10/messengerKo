@@ -30,9 +30,11 @@ class SocketService {
 
   connect(token: string) {
     if (this.socket?.connected) {
+      console.log('🔌 Socket already connected, skipping...');
       return;
     }
 
+    console.log('🔌 Attempting to connect to Socket.io server...');
     this.socket = io('http://localhost:3002', {
       auth: {
         token
