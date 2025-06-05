@@ -82,27 +82,7 @@ async function apiRequest<T = any>(
 
 // Authentication API
 export const authApi = {
-  async register(userData: {
-    username: string;
-    email: string;
-    password: string;
-  }) {
-    const response = await apiRequest<{
-      user: any;
-      token: string;
-    }>('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(userData),
-    });
 
-    // Store token (only in browser)
-    if (browser) {
-      localStorage.setItem('auth_token', response.token);
-      localStorage.setItem('auth_user', JSON.stringify(response.user));
-    }
-    
-    return response;
-  },
 
   async login(credentials: {
     identifier: string;

@@ -61,53 +61,7 @@ function createAuthStore() {
 			}
 		},
 		
-		signup: async (email: string, username: string, password: string) => {
-			update(state => ({ ...state, isLoading: true }));
 
-			try {
-				const response = await authApi.register({
-					username,
-					email,
-					password
-				});
-
-				// Handle user registration response
-				const userData = response.user;
-				const userType = response.userType || 'user';
-
-				const user: User = {
-					id: userData._id,
-					email: userData.email,
-					username: userData.username,
-					isOnline: userData.isOnline || false,
-					avatar: userData.avatar,
-					userType: userType,
-					role: userData.role || 'user',
-					permissions: userData.permissions || [],
-					fullName: userData.fullName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
-				};
-
-				set({
-					user,
-					isAuthenticated: true,
-					isLoading: false
-				});
-
-				// Connect to Socket.io
-				if (browser) {
-					const token = localStorage.getItem('auth_token');
-					if (token) {
-						socketService.connect(token);
-					}
-				}
-
-				return { success: true };
-			} catch (error) {
-				update(state => ({ ...state, isLoading: false }));
-				const apiError = error as ApiError;
-				return { success: false, error: apiError.message || 'Signup failed' };
-			}
-		},
 		
 		logout: async () => {
 			try {

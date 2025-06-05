@@ -23,4 +23,4 @@
 	<title>Login - Messenger</title>
 </svelte:head>
 
-<AuthForm mode="login" />
+<AuthForm />

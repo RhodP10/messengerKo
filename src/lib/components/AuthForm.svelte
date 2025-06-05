@@ -2,16 +2,8 @@
 	import { authStore } from '../stores/auth.js';
 	import { goto } from '$app/navigation';
 
-	interface Props {
-		mode: 'login' | 'signup';
-	}
-
-	let { mode }: Props = $props();
-
 	let email = $state('');
-	let username = $state('');
 	let password = $state('');
-	let confirmPassword = $state('');
 	let error = $state('');
 
 	const authState = $derived(authStore);
@@ -25,28 +17,8 @@
 			return;
 		}
 
-		if (mode === 'signup') {
-			if (!username) {
-				error = 'Username is required';
-				return;
-			}
-			if (password !== confirmPassword) {
-				error = 'Passwords do not match';
-				return;
-			}
-			if (password.length < 6) {
-				error = 'Password must be at least 6 characters';
-				return;
-			}
-		}
-
 		try {
-			let result;
-			if (mode === 'login') {
-				result = await authStore.login(email, password);
-			} else {
-				result = await authStore.signup(email, username, password);
-			}
+			const result = await authStore.login(email, password);
 
 			if (result.success) {
 				// Redirect based on user type
@@ -75,16 +47,10 @@
 				</svg>
 			</div>
 			<h2 class="mt-6 text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
-				{mode === 'login' ? 'Sign in to your account' : 'Create your account'}
+				Sign in to your account
 			</h2>
 			<p class="mt-2 text-center text-sm text-gray-600">
-				{mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
-				<a
-					href={mode === 'login' ? '/signup' : '/login'}
-					class="font-medium text-green-600 hover:text-green-500"
-				>
-					{mode === 'login' ? 'Sign up' : 'Sign in'}
-				</a>
+				Welcome to MessengerKo
 			</p>
 		</div>
 		
@@ -104,51 +70,19 @@
 					/>
 				</div>
 
-				{#if mode === 'signup'}
-					<div>
-						<label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-						<input
-							id="username"
-							name="username"
-							type="text"
-							autocomplete="username"
-							required
-							bind:value={username}
-							class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-							placeholder="Choose a username"
-						/>
-					</div>
-				{/if}
-
 				<div>
 					<label for="password" class="block text-sm font-medium text-gray-700">Password</label>
 					<input
 						id="password"
 						name="password"
 						type="password"
-						autocomplete={mode === 'login' ? 'current-password' : 'new-password'}
+						autocomplete="current-password"
 						required
 						bind:value={password}
 						class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
 						placeholder="Enter your password"
 					/>
 				</div>
-
-				{#if mode === 'signup'}
-					<div>
-						<label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-						<input
-							id="confirmPassword"
-							name="confirmPassword"
-							type="password"
-							autocomplete="new-password"
-							required
-							bind:value={confirmPassword}
-							class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-							placeholder="Confirm your password"
-						/>
-					</div>
-				{/if}
 			</div>
 
 			{#if error}
@@ -170,7 +104,7 @@
 						</svg>
 						Processing...
 					{:else}
-						{mode === 'login' ? 'Sign in' : 'Sign up'}
+						Sign in
 					{/if}
 				</button>
 			</div>
