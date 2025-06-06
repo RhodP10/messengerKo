@@ -33,7 +33,7 @@ const server = createServer(app);
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5174'],
+    origin: true,
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -69,9 +69,9 @@ const limiter = rateLimit({
 
 app.use('/api/', limiter);
 
-// CORS middleware
+// CORS middleware - Allow all origins for now
 app.use(cors({
-  origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5174'],
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
