@@ -30,6 +30,9 @@ dotenv.config();
 const app = express();
 const server = createServer(app);
 
+// Trust proxy for Render.com deployment
+app.set('trust proxy', 1);
+
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
@@ -55,16 +58,17 @@ app.use(helmet({
   },
 }));
 
-// Rate limiting
+// Rate limiting - More lenient for development
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 1000, // Increased limit for testing
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.'
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true, // Trust proxy headers
 });
 
 app.use('/api/', limiter);
